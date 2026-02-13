@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Valentine's</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: "Mom´sTypewriter";
+      src: url('/valentines/assets/Mom差___.ttf') format('truetype');
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #f6f0df;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .scene {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .text-block {
+      width: 250px;
+      height: 200px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .heart-stamp {
+      width: 20px;
+      height: auto;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .message {
+      font-family: "Mom´sTypewriter", monospace;
+      font-size: 13px;
+      color: #4a3828;
+      letter-spacing: 0.04em;
+    }
+
+    .subtitle-area {
+      margin-top: 42px;
+    }
+
+    .save-btn {
+      display: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #8A8A8A;
+      background: none;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      padding: 0;
+      align-self: flex-end;
+      margin-top: auto;
+    }
+
+    .save-btn:hover {
+      color: #4a3828;
+    }
+
+    .hint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #8A8A8A;
+      display: none;
+    }
+
+    .subtitle {
+      font-family: "Mom´sTypewriter", monospace;
+      font-size: 13px;
+      color: #4a3828;
+      letter-spacing: 0.04em;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .cursor {
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    .typewriter-wrap {
+      position: relative;
+      width: 400px;
+      line-height: 0;
+    }
+
+    .typewriter-img {
+      display: block;
+      width: 400px;
+    }
+
+    .typewriter-carriage {
+      position: absolute;
+      left: calc(14% + 4px);
+      top: 1.5%;
+      width: 74%;
+      height: auto;
+      pointer-events: none;
+      transition: transform 0.05s ease-out;
+    }
+
+    .key-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .key-flash {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(250, 40, 40, 0.7);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: keyFlash 0.4s ease-out forwards;
+    }
+
+    @keyframes keyFlash {
+      0%   { opacity: 0.7; transform: translate(-50%, -50%) scale(0.8); }
+      15%  { opacity: 0.7; transform: translate(-50%, -50%) scale(1.0); }
+      100% { opacity: 0;   transform: translate(-50%, -50%) scale(1.1); }
+    }
+
+    .see-all {
+      display: block;
+      width: 300px;
+      text-align: right;
+      font-family: 'Mom´sTypewriter', monospace;
+      font-size: 13px;
+      color: #4a3828;
+      background: none;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .see-all:hover {
+      color: #4a3828;
+      text-decoration: underline;
+    }
+
+    /* "see all" overlay */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #f6f0df;
+      overflow-y: auto;
+    }
+
+    .overlay.open {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding-bottom: 80px;
+    }
+
+    .overlay-content {
+      width: 250px;
+    }
+
+    .overlay-title-text {
+      font-family: "Mom´sTypewriter", monospace;
+      font-size: 13px;
+      color: #4a3828;
+      letter-spacing: 0.04em;
+    }
+
+    .overlay-items {
+      margin-top: 42px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .overlay-item {
+      position: relative;
+      min-height: 90px; /* keyboard thumbnail is ~85px tall at 150px wide */
+    }
+
+    .overlay-kbd {
+      position: absolute;
+      left: -108px;
+      top: 0;
+      width: 100px;
+      height: 60px;
+    }
+
+    .overlay-key-dot {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(250, 40, 40, 0.7);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .overlay-items p {
+      font-family: "Mom´sTypewriter", monospace;
+      font-size: 13px;
+      color: #4a3828;
+      letter-spacing: 0.04em;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .overlay-footer {
+      margin-top: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .letter-img {
+      height: 32px;
+      width: auto;
+    }
+
+    .with-love-text {
+      font-family: "Mom´sTypewriter", monospace;
+      font-size: 13px;
+      color: #4a3828;
+      letter-spacing: 0.04em;
+    }
+
+    .overlay-close {
+      position: fixed;
+      top: 28px;
+      right: 36px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #8A8A8A;
+      background: none;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+    }
+
+    .overlay-close:hover {
+      color: #4a3828;
+    }
+
+    .music-area {
+      position: fixed;
+      top: 24px;
+      right: 36px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .music-hint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #8A8A8A;
+    }
+
+    .music-btn {
+      position: relative;
+      width: 24px;
+      height: 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .music-btn img {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <div class="text-block">
+      <img src="/valentines/assets/heart.png" class="heart-stamp" alt="" />
+      <p class="message"><span id="typed"></span><br id="title-br" style="display:none"><span id="typed-l2"></span><span class="cursor" id="cursor" style="opacity:0">_</span></p>
+      <div class="subtitle-area">
+        <p class="hint" id="hint">(press enter.)</p>
+        <p class="subtitle" id="subtitle"><span id="typed2"></span><span class="cursor" id="cursor2" style="opacity:0">_</span></p>
+      </div>
+      <button class="save-btn" id="save-btn">(copy)</button>
+    </div>
+    <div class="typewriter-wrap">
+      <img src="/valentines/assets/typewriterNoTop.png" alt="Typewriter" class="typewriter-img" />
+      <img src="/valentines/assets/typewriteTop.png" alt="" class="typewriter-carriage" id="carriage" />
+      <div class="key-overlay" id="key-overlay"></div>
+    </div>
+    <button class="see-all" id="see-all">see all</button>
+  </div>
+
+  <div class="music-area">
+    <span class="music-hint">(experience is best with music ->)</span>
+    <button class="music-btn" id="music-btn">
+      <img src="/valentines/assets/musicOff.png" id="music-icon" alt="music" style="width:23px" />
+    </button>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <button class="overlay-close" id="overlay-close">(close)</button>
+    <div class="overlay-content">
+      <img src="/valentines/assets/heart.png" class="heart-stamp" alt="" />
+      <p class="overlay-title-text">Happy Valentines Day.<br>Thanks</p>
+      <div class="overlay-items" id="overlay-list"></div>
+      <div class="overlay-footer">
+        <img src="/valentines/assets/letter.png" class="letter-img" alt="" />
+        <span class="with-love-text">with love.</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const items = [
+      'for snoring and taking up all the space on the bed',
+      'for singing randomly (and just a little bit badly)',
+      'for always getting injured when playing basketball',
+      'for always asking for back scratches',
+      'for making me your personal masseuse',
+      'for always trying to carry me',
+      'for extremely sensitive nipples',
+      'for always sleeping at 10pm',
+      'for making fun of my cavities',
+      "for thinking I'm stinky and need to take a shower",
+      "for getting grumpy when you're tired and/or hungry (which is 70% of the day)",
+      'for getting sick when the window is open',
+      'for never letting me eat on the couch',
+      'for intense slouching',
+      'for chicken feet',
+      'for innocent bear eyes',
+      'for not letting me get salt & straw',
+      'for wishing that I could do a push up',
+      'for getting tired and not wanting to play games',
+      'for never getting me flowers',
+      'for making fun of my rice eating habits',
+      "for getting upset at me when I think you don't like trying new things",
+      "for getting upset at me when I think you don't like eating vegetables",
+      "for getting upset at me when I don't want to take a shower at your apartment",
+      "for getting upset when I seem like I don't believe you",
+      'for not wanting to watch any shows with me other than anime or reality tv',
+    ];
+
+    // --- keyboard.png key positions [x%, y%] (calibrated via click measurements) ---
+    const kbdKeyPos = {
+      // QWERTZ row  y=37.9%  step≈5.35%
+      'q':[27.3,37.9],'w':[32.7,37.9],'e':[38.0,37.9],'r':[43.4,37.9],'t':[48.7,37.9],
+      'z':[54.1,37.9],'u':[59.4,37.9],'i':[64.7,37.9],'o':[70.1,37.9],'p':[75.4,37.9],
+      // home row    y=49.6%  step≈5.65%
+      'a':[28.0,49.6],'s':[34.0,49.6],'d':[39.3,49.6],'f':[45.0,49.6],'g':[50.6,49.6],
+      'h':[56.3,49.6],'j':[61.9,49.6],'k':[67.6,49.6],'l':[73.2,49.6],
+      // bottom row  y=61.3%  step≈6.0%
+      'y':[30.0,61.3],'x':[36.0,61.3],'c':[42.0,61.3],'v':[48.0,61.3],'b':[54.0,61.3],
+      'n':[60.0,61.3],'m':[66.0,61.3],
+    };
+
+    // --- populate overlay ---
+    const list = document.getElementById('overlay-list');
+    items.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'overlay-item';
+
+      // keyboard thumbnail with key dots
+      const kbd = document.createElement('div');
+      kbd.className = 'overlay-kbd';
+      const letters = new Set(item.toLowerCase().replace(/[^a-z]/g, '').split('').filter(c => c !== 'f' && c !== 'o' && c !== 'r'));
+      letters.forEach(ch => {
+        const pos = kbdKeyPos[ch];
+        if (!pos) return;
+        const dot = document.createElement('span');
+        dot.className = 'overlay-key-dot';
+        dot.style.left = pos[0] + '%';
+        dot.style.top  = pos[1] + '%';
+        kbd.appendChild(dot);
+      });
+
+      row.appendChild(kbd);
+
+      const p = document.createElement('p');
+      p.textContent = item + '.';
+      row.appendChild(p);
+
+      list.appendChild(row);
+    });
+
+    // --- elements ---
+    const el        = document.getElementById('typed');
+    const elL2      = document.getElementById('typed-l2');
+    const titleBr   = document.getElementById('title-br');
+    const cursor    = document.getElementById('cursor');
+    const el2       = document.getElementById('typed2');
+    const cursor2   = document.getElementById('cursor2');
+    const hint      = document.getElementById('hint');
+    const sub       = document.getElementById('subtitle');
+    const seeAll    = document.getElementById('see-all');
+    const saveBtn   = document.getElementById('save-btn');
+    const keyOverlay = document.getElementById('key-overlay');
+    const carriageEl = document.getElementById('carriage');
+
+    // --- carriage movement ---
+    const CARRIAGE_STEP  = 10;
+    const CARRIAGE_MAX   = 100;
+    const CARRIAGE_EVERY = 3;   // move once every N characters
+    let carriageOffset   = 0;
+    let carriageCharCount = 0;
+    const bellAudio = new Audio('/valentines/assets/bell.mp4');
+
+    function advanceCarriage() {
+      carriageCharCount++;
+      if (carriageCharCount % CARRIAGE_EVERY !== 0) return;
+      carriageOffset += CARRIAGE_STEP;
+      if (carriageOffset >= CARRIAGE_MAX) {
+        carriageOffset = 0;
+        carriageEl.style.transition = 'transform 0.2s ease-in';
+        carriageEl.style.transform  = 'translateX(0px)';
+        setTimeout(() => { carriageEl.style.transition = ''; }, 200);
+      } else {
+        carriageEl.style.transform = `translateX(${carriageOffset}px)`;
+      }
+    }
+
+    function resetCarriage() {
+      carriageOffset = 0;
+      carriageCharCount = 0;
+      carriageEl.style.transition = 'transform 0.2s ease-in';
+      carriageEl.style.transform  = 'translateX(0px)';
+      setTimeout(() => { carriageEl.style.transition = ''; }, 200);
+    }
+
+    // --- key flash ---
+    // x%, y% positions measured by click calibration
+    const keyPos = {
+      // QWERTZ row
+      'q':[25.9,65.3],'w':[31.1,65.3],'e':[36.1,65.3],'r':[41.4,65.3],'t':[46.4,65.3],
+      'z':[51.1,65.3],'u':[56.1,65.3],'i':[61.6,65.3],'o':[66.4,65.3],'p':[70.9,65.3],
+      // ASDFG row
+      'a':[27.4,72.2],'s':[32.4,72.2],'d':[37.6,72.2],'f':[42.4,72.2],'g':[47.1,72.2],
+      'h':[52.4,72.2],'j':[57.4,72.2],'k':[62.4,72.2],'l':[67.6,72.2],
+      // YXCVB row
+      'y':[29.9,78.8],'x':[34.9,78.8],'c':[40.1,78.8],'v':[45.4,78.8],'b':[50.4,78.8],
+      'n':[55.1,78.8],'m':[60.4,78.8],
+      // punctuation
+      ',':[65.1,78.8],'.':[70.1,78.8],
+      // number row — estimated from row-spacing pattern (y ≈ 58.5%, stagger -1.7% from Q row)
+      '1':[24.2,58.5],'2':[29.2,58.5],'3':[34.2,58.5],'4':[39.2,58.5],'5':[44.2,58.5],
+      '6':[49.2,58.5],'7':[54.2,58.5],'8':[59.2,58.5],'9':[64.2,58.5],'0':[69.2,58.5]
+    };
+
+    function flashKey(ch) {
+      const pos = keyPos[ch.toLowerCase()];
+      if (!pos) return;
+      const dot = document.createElement('span');
+      dot.className = 'key-flash';
+      dot.style.left = pos[0] + '%';
+      dot.style.top  = pos[1] + '%';
+      keyOverlay.appendChild(dot);
+      dot.addEventListener('animationend', () => dot.remove());
+    }
+
+    // --- title typing ---
+    const titleLine1 = 'Happy Valentines Day.';
+    const titleLine2 = 'Thanks';
+
+    let titleDone  = false;
+    let itemStarted = false;
+
+    function typeLine2() {
+      let j = 0;
+      function tick() {
+        if (j < titleLine2.length) {
+          const ch = titleLine2[j++];
+          elL2.textContent += ch;
+          flashKey(ch);
+          advanceCarriage();
+          setTimeout(tick, 80 + Math.random() * 60);
+        } else {
+          cursor.style.opacity = '';
+          seeAll.style.opacity = '1';
+          hint.style.display = 'block';
+          titleDone = true;
+        }
+      }
+      tick();
+    }
+
+    function typeTitle() {
+      let ti = 0;
+      function tick() {
+        if (ti < titleLine1.length) {
+          const ch = titleLine1[ti++];
+          el.textContent += ch;
+          flashKey(ch);
+          advanceCarriage();
+          setTimeout(tick, 80 + Math.random() * 60);
+        } else {
+          titleBr.style.display = '';
+          setTimeout(typeLine2, 80 + Math.random() * 60);
+        }
+      }
+      tick();
+    }
+
+    // --- item typing ---
+    let currentItem = null;
+    let gen = 0; // cancel stale timeouts
+
+    function pickItem() {
+      const others = items.filter(x => x !== currentItem);
+      return others[Math.floor(Math.random() * others.length)];
+    }
+
+    function typeItem(item) {
+      currentItem = item;
+      el2.textContent = '';
+      cursor2.style.opacity = '0';
+      resetCarriage();
+      const myGen = ++gen;
+      let j = 0;
+
+      function tick() {
+        if (myGen !== gen) return; // cancelled
+        if (j < item.length) {
+          const ch = item[j++];
+          el2.textContent += ch;
+          flashKey(ch);
+          advanceCarriage();
+          setTimeout(tick, 80 + Math.random() * 60);
+        } else {
+          cursor2.style.opacity = '';
+        }
+      }
+      tick();
+    }
+
+    // --- Enter moves cursor to next line, then cycles on each press ---
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Enter' || !titleDone) return;
+      if (!itemStarted) {
+        // first Enter: swap hint → subtitle, move cursor down
+        cursor.style.opacity = '0';
+        cursor.style.animation = 'none';
+        hint.style.display = 'none';
+        sub.style.display = 'block';
+        saveBtn.style.display = 'block';
+        itemStarted = true;
+      }
+      if (bellAudio.paused) {
+        bellAudio.currentTime = 0;
+        bellAudio.play().catch(() => {});
+      }
+      typeItem(pickItem());
+    });
+
+    // --- save button ---
+    saveBtn.addEventListener('click', () => {
+      if (!currentItem) return;
+      const copyText = `❤ Happy Valentines Day. Thanks\n${currentItem}_`;
+      navigator.clipboard.writeText(copyText).catch(() => {});
+      saveBtn.textContent = '(copied.)';
+      setTimeout(() => { saveBtn.textContent = '(copy)'; }, 1500);
+    });
+
+    // --- see all overlay ---
+    document.getElementById('see-all').addEventListener('click', () => {
+      const rect = document.querySelector('.text-block').getBoundingClientRect();
+      const overlay = document.getElementById('overlay');
+      overlay.style.paddingTop  = rect.top + 'px';
+      overlay.style.paddingLeft = rect.left + 'px';
+      overlay.classList.add('open');
+    });
+    document.getElementById('overlay-close').addEventListener('click', () => {
+      document.getElementById('overlay').classList.remove('open');
+    });
+
+    // --- music toggle ---
+    const musicBtn  = document.getElementById('music-btn');
+    const musicIcon = document.getElementById('music-icon');
+    const musicHint = document.querySelector('.music-hint');
+    const musicAudio = new Audio();
+    musicAudio.loop = true;
+    let musicPlaying = false;
+    let musicReady = false;
+
+    // fetch the whole file into memory so first click is instant
+    fetch('/valentines/assets/song.mp4')
+      .then(r => r.blob())
+      .then(blob => {
+        musicAudio.src = URL.createObjectURL(blob);
+        musicReady = true;
+      });
+
+    musicBtn.addEventListener('click', () => {
+      musicPlaying = !musicPlaying;
+      if (musicPlaying) {
+        musicIcon.src         = '/valentines/assets/musicOn.png';
+        musicIcon.style.width = '20px';
+        musicHint.style.display = 'none';
+        if (musicReady) musicAudio.play().catch(() => {});
+      } else {
+        musicIcon.src         = '/valentines/assets/musicOff.png';
+        musicIcon.style.width = '23px';
+        musicHint.style.display = '';
+        musicAudio.pause();
+      }
+    });
+
+    // --- start ---
+    setTimeout(typeTitle, 600);
+  </script>
+</body>
+</html>
